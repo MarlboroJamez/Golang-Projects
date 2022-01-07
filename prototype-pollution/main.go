@@ -1,52 +1,75 @@
 package main
 
 import (
-	"context"
-	"log"
 	"bufio"
-	"sync"
-	"flag"
+	"context"
+	"fmt"
+	"log"
 	"os"
+
 	"github.com/chromedp/chromedp"
 )
 
-func main() {
-	var userJS string
-	flag.StringVar(&userJS, "j", "", "the JS to run on each page")
-	flag.Parse()
-	sc := bufio.NewScanner(os.Stdin)
-	
-	var wg sync.WaitGroup
-	urls := make(chan string)
-	for i := 0; i < 5; i++ {
-	wg.Add(1)
-		go func(){
-			for u := range urls{
-				ctx, cancel := chromedp.NewContext(context.Background())
+var (
+	concurrency int
+	urls        bool
+	outputFile  string
+)
 
+const (
+	//InfoColor    = "\033[1;34m%s\033[0m"
+	NoticeColor = "\033[1;36m%s\033[0m"
+	//WarningColor = "\033[1;33m%s\033[0m"
+	ErrorColor = "\033[1;31m%s\033[0m"
+	//DebugColor   = "\033[0;36m%s\033[0m"
+)
 
-				var res string
-				err := chromedp.Run(ctx,
-					chromedp.Navigate(u),
-					chromedp.Evaluate(userJS, &res),
-				)
-				cancel()
-				
-				if err != nil {
-					log.Printf("error on %s: %s", u,err)
-					continue
-				}
-
-				log.Printf("%s: %v", u, res)
-				}
-				wg.Done()	
-		}()
-	}
-	
-	for sc.Scan() {
-		u := sc.Text()	
-		urls <- u
-	}
-	wg.Wait()
-	
+func banner() {
+	fmt.Println("|_@Marlboro_Jamez_|")
 }
+
+func main() {
+	sc := bufio.NewScanner(os.Stdin)
+	for sc.Scan() {
+		// create context
+		url := sc.Text()
+		//fmt.Println(url)
+		ctx, cancel := chromedp.NewContext(context.Background())
+
+		// run task list
+		var res string
+		if urls == true {
+			err := chromedp.Run(ctx,
+				chromedp.Navigate(url+"&__proto__[protoscan]=protoscan"),
+				chromedp.Evaluate(`window.protoscan`, &res),
+			)
+			cancel()
+			if err != nil {
+				log.Printf(ErrorColor, url+" [Not Vulnerable]")
+				continue
+			}
+		} else {
+			err := chromedp.Run(ctx,
+				chromedp.Navigate(url+"/"+"?__proto__[protoscan]=protoscan"),
+				chromedp.Evaluate(`window.protoscan`, &res),
+			)
+			cancel()
+			if err != nil {
+				log.Printf(ErrorColor, url+" [Not Vulnerable]")
+				continue
+			}
+		}
+		if outputFile != "" {
+			f, err := os.OpenFile(outputFile, os.O_APPEND|os.O_WRONLY, 0644)
+			if err != nil {
+				log.Println(err)
+			}
+			if _, err := f.WriteString(url + "\n"); err != nil {
+				log.Fatal(err)
+			}
+			f.Close()
+		}
+		log.Printf(NoticeColor, url+" [Vulnerable]")
+	}
+}
+

@@ -1,3 +1,5 @@
+github.com/KathanP19/protoscan v0.0.0-20210411034504-e1dbe7befc45 h1:QVLHlpzn1Tlj7NIGkNu3bDKO1/xMfCoO7ADLR/5iCss=
+github.com/KathanP19/protoscan v0.0.0-20210411034504-e1dbe7befc45/go.mod h1:X6n8qH1SrKDbtAmJH5aFut+mAsSwn1NFOmPDEO+deT8=
 github.com/chromedp/cdproto v0.0.0-20210323015217-0942afbea50e h1:UimnzLuARNkGi2XsNznUoOLFP/noktdUMrr7fcb3D4U=
 github.com/chromedp/cdproto v0.0.0-20210323015217-0942afbea50e/go.mod h1:At5TxYYdxkbQL0TSefRjhLE3Q0lgvqKKMSFUglJ7i1U=
 github.com/chromedp/chromedp v0.6.10 h1:Yd4X6ngkWbn6A+hv6mUzV9kVHrPn7L4+vf2uyNbze2s=
